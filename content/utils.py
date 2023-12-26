@@ -14,7 +14,7 @@ from pyodide.http import open_url
 DB_NAME = "JupyterLite Storage"
     
 # Via: https://github.com/jupyterlite/jupyterlite/discussions/91#discussioncomment-1137213
-async def get_contents(path, raw=False):
+async def get_contents(store, path, raw=False):
     """Load file from in-browser storage. Contents are in ['content'].
     
     Use the IndexedDB API to access JupyterLite's in-browser (for now) storage
@@ -34,8 +34,8 @@ async def get_contents(path, raw=False):
     if IDBOpenDBRequest.result is None:
         return None
         
-    IDBTransaction = IDBOpenDBRequest.result.transaction("settings", "readonly")
-    IDBObjectStore = IDBTransaction.objectStore("settings")
+    IDBTransaction = IDBOpenDBRequest.result.transaction(store, "readonly")
+    IDBObjectStore = IDBTransaction.objectStore(store)
     IDBRequest = IDBObjectStore.get(path, "key")
     IDBRequest.onsuccess = IDBRequest.onerror = queue.put_nowait
     
@@ -50,7 +50,7 @@ async def get_contents(path, raw=False):
 
 
 # via https://github.com/jupyterlite/jupyterlite/discussions/91#discussioncomment-2440964
-async def put_contents(content, path, overwrite=False):
+async def put_contents(content, store, path, overwrite=False):
     """
     """
     # count existing
@@ -63,8 +63,8 @@ async def put_contents(content, path, overwrite=False):
     if IDBOpenDBRequest.result is None:
         return None
         
-    IDBTransaction = IDBOpenDBRequest.result.transaction("settings", "readonly")
-    IDBObjectStore = IDBTransaction.objectStore("settings")
+    IDBTransaction = IDBOpenDBRequest.result.transaction(store, "readonly")
+    IDBObjectStore = IDBTransaction.objectStore(store)
     IDBRequest = IDBObjectStore.count(path)
     
     IDBRequest.onsuccess = IDBRequest.onerror = queue.put_nowait
@@ -91,8 +91,8 @@ async def put_contents(content, path, overwrite=False):
     }
     #print(value)
 
-    IDBTransaction = IDBOpenDBRequest.result.transaction("settings", "readwrite")
-    IDBObjectStore = IDBTransaction.objectStore("settings")
+    IDBTransaction = IDBOpenDBRequest.result.transaction(store, "readwrite")
+    IDBObjectStore = IDBTransaction.objectStore(store)
     # see https://github.com/pyodide/pyodide/issues/1529#issuecomment-905819520
     value_as_js_obj = to_js(value, dict_converter=Object.fromEntries)
     if count == 0:
