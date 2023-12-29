@@ -78,14 +78,8 @@ class Activity(object):
                 
         
     def load_json(self, json_text):
-        # Allow use of widgets:
-        if widgets is None:
-            return
-
-        json = json_text
-
         self.index = 0
-        for item in json:
+        for item in json_text:
             question = item["question"]
             question_figure = item.get("figure", None)
             keywords = item.get("keywords", None)
