@@ -56,26 +56,7 @@ class Activity(object):
         self.overall_right_options = []
         self.mark = None
         self.submit_button = False
-        self.timer = None
-
-    def load(self, filename):
-        if filename.startswith("~"):
-            filename = os.path.expanduser(filename)
-        filename = os.path.abspath(filename)
-        self.filename = filename
-        
-#         if self.quiz_filename is None:
-#             self.quiz_filename = filename + ".quiz"
-#         touch(self.quiz_filename)
-        
-        with open(self.filename, 'r') as f:
-            filestr = f.read()
-            filestr, num_quizzes = typeset_quizzes1(filestr, insert_missing_quiz_header=False)
-            json_quiz, _, _ = extract_quizzes(filestr, 'python')            
-#         with open(filename, "w") as fp:
-#             fp.write(self.code)
-        self.load_json(json_quiz)
-                
+        self.timer = None            
         
     def load_json(self, json_text):
         self.index = 0
