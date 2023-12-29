@@ -263,7 +263,7 @@ class Question(object):
             info = self.question_figure.strip('[').split(']')
             arg_string = info[0].split()
             caption = info[1]
-            self.question_figure_widget.append_display_data(Image(arg_string[0], **eval(f"dict({arg_string[1]},{arg_string[2]})")))
+            self.question_figure_widget.append_display_data(Image(arg_string[0].strip(','), **eval(f"dict({arg_string[1]},{arg_string[2]})")))
         if self.keywords:
             self.keywords_widget.append_display_data(Markdown('<font color=red>*Read up on: {}*</font>'.\
                                                               format(reduce((lambda x,y: x+', '+y), self.keywords))))
