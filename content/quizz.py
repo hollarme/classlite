@@ -9,7 +9,7 @@ import getpass
 import datetime
 
 from collections import OrderedDict
-from IPython.display import Markdown
+from IPython.display import Markdown, Image
 import re
 from functools import reduce
 from random import shuffle
@@ -87,9 +87,11 @@ class Activity(object):
         self.index = 0
         for item in json:
             question = item["question"]
+            question_figure = item.get("question figure", None)
             keywords = item.get("keywords", None)
+            label = item.get("label", None)
             options = item["choices"]
-            q = Question(item["id"], question, options, keywords)
+            q = Question(item["id"], question, question_figure, options, keywords, label)
             self.questions.append(q)
 
         self.build_quiz_env()
@@ -171,7 +173,7 @@ class Activity(object):
             self.top_margin = widgets.HTML("")
             #self.top_margin.layout.height = "100px"
             right_stack = widgets.VBox([self.top_margin, self.results_html])
-            self.stack = widgets.VBox([widgets.HBox([item.tick_widget, item.id_widget]), widgets.VBox([item.question_widget, item.keywords_widget])] + item.choice_row_list)
+            self.stack = widgets.VBox([widgets.HBox([item.tick_widget, item.id_widget]), widgets.VBox([item.question_widget, item.question_figure_widget, item.keywords_widget])] + item.choice_row_list)
 #                                        + [widgets.HBox([self.prev_button, self.results_button, self.next_button])])
             self.output = widgets.Output(layout={'border': '1px solid black'})
             self.top_level = widgets.VBox([widgets.HBox([self.stack, right_stack]), self.output])
@@ -238,11 +240,13 @@ class Activity(object):
 
 
 class Question(object):
-    def __init__(self, id, question, options, keywords):
+    def __init__(self, id, question, question_figure, options, keywords, label):
         self.id = id
         self.question = question
+        self.question_figure = question_figure
         self.options = options
         self.keywords = keywords
+        self.label = label
         
         self.right_options =  [{'no': self.id}]
         
@@ -250,6 +254,7 @@ class Question(object):
         self.id_widget = widgets.Output(layout={'border': '1px solid black'})
 #         self.question_widget = widgets.HTML("")
         self.question_widget = widgets.Output()
+        self.question_figure_widget = widgets.Output()
         self.keywords_widget = widgets.Output()
                                                     
         
@@ -279,6 +284,11 @@ class Question(object):
     def set_question(self):
 #         self.question_widget.value = "<h1>%s</h1>" % self.question
         self.question_widget.append_display_data(Markdown(self.question))
+        if self.question_figure:
+            info = self.question_figure.strip('[').split(']')
+            arg_string = info[0].split()
+            caption = info[1]
+            self.question_figure_widget.append_display_data(Image(arg_string[0], **eval(f"dict({arg_string[1]},{arg_string[2]})")))
         if self.keywords:
             self.keywords_widget.append_display_data(Markdown('<font color=red>*Read up on: {}*</font>'.\
                                                               format(reduce((lambda x,y: x+', '+y), self.keywords))))
