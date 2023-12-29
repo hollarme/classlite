@@ -87,7 +87,7 @@ class Activity(object):
         self.index = 0
         for item in json:
             question = item["question"]
-            question_figure = item.get("question figure", None)
+            question_figure = item.get("figure", None)
             keywords = item.get("keywords", None)
             label = item.get("label", None)
             options = item["choices"]
