@@ -110,9 +110,9 @@ class Activity(object):
         print(self.results)
             
     
-    def callback(self):
-        if not self.submit_button:
-            await self.handle_submit(None)
+    # def callback(self):
+    #     if not self.submit_button:
+    #         await self.handle_submit(None)
 
     def render(self):
         try:
