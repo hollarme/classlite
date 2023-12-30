@@ -3,31 +3,33 @@ try:
     from ipywidgets import widgets
 except ImportError:
     widgets = None
-# from metakernel import Magic, option
 import os
 import getpass
 import datetime
 
 from collections import OrderedDict
-from IPython.display import Markdown, Image
+from IPython.display import Markdown, Image, Javascript
 import re
 from functools import reduce
 from random import shuffle
 
 from datetime import datetime, timedelta
-# from metakernel.display import display, Javascript
 import threading
 
 import json
+import requests
+
+import utils as ut
 
 
+url = "http://localhost:8000/graphql/"
 
-        
-class QuizTimeOut(Exception):
-    def __init__(self, body):
-        DialogBox('Quiz Time Out', body)
-        
-        
+answer_mutation = """mutation ($answers: JSON!) {
+                              upsertAnswer (answers: $answers)
+                            }"""
+
+answers = [{'id':1, 'user':'EEG/2006/033', 'choices':['a'], 'answer':None},{'id':2, 'user':'EEG/2006/033', 'choices':['b', 'c'], 'answer':None}]
+
 class DialogBox():
     
     def __init__(self, title, body):
@@ -71,7 +73,7 @@ class Activity(object):
 
         self.build_quiz_env()
        
-    def handle_submit(self, sender):
+    async def handle_submit(self):
 
         for item in self.quiz_container[:-1]:
             results = {}
@@ -92,27 +94,25 @@ class Activity(object):
                         # disable the check button
                         item.children[0].children[0].children[i+2].children[0].disabled = self.submit_button = True
 #                         self.timer.cancel()
-                        
-                    results['choices'] = answers
                     
+                    results['choices'] = answers
                     self.results.append(results)
                     
-#                     print(self.results)
-            
-            
-#         print(self.results)
         #self.grader()
-                
-            
+        self.results['user'] = await ut.get_contents('settings','registration number', raw=False)
+        
         with open(self.results_filename, "a+") as g:
             self.results.append({'submitted@': datetime.today().strftime('%m/%d/%Y %I:%M%p')})
             g.write(json.dumps(self.results))
-            
-        
 
+        r = requests.post(url, json={"query": answer_mutation, "variables":{"answers": json.dumps(self.results)}})
+
+        print(self.results)
+            
+    
     def callback(self):
         if not self.submit_button:
-            self.handle_submit(None)
+            await self.handle_submit()
 
     def render(self):
         try:
@@ -165,7 +165,7 @@ class Activity(object):
 
             
         self.button = widgets.Button(description = "Submit")
-        self.button.on_click(self.handle_submit)
+        self.button.on_click(await self.handle_submit)
         self.button.layout.margin = "20px"
         self.score_widgets = widgets.HTML("""<br/><br clear="all"/><b>Score</b>: """)
         
