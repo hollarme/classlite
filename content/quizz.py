@@ -17,7 +17,7 @@ from datetime import datetime, timedelta
 import threading
 
 import json
-import fetch
+from js import Object, fetch
 
 import utils as ut
 
