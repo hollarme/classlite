@@ -73,7 +73,7 @@ class Activity(object):
 
         self.build_quiz_env()
        
-    async def handle_submit(self):
+    async def handle_submit(self, ph):
 
         for item in self.quiz_container[:-1]:
             results = {}
@@ -112,7 +112,7 @@ class Activity(object):
     
     def callback(self):
         if not self.submit_button:
-            await self.handle_submit()
+            await self.handle_submit(None)
 
     def render(self):
         try:
