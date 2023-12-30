@@ -17,7 +17,7 @@ from datetime import datetime, timedelta
 import threading
 
 import json
-import requests
+import fetch
 
 import utils as ut
 
@@ -100,14 +100,18 @@ class Activity(object):
                     
         #self.grader()
         self.results['user'] = await ut.get_contents('settings','registration number', raw=False)
+        print(self.results)
         
         with open(self.results_filename, "a+") as g:
             self.results.append({'submitted@': datetime.today().strftime('%m/%d/%Y %I:%M%p')})
             g.write(json.dumps(self.results))
 
-        r = requests.post(url, json={"query": answer_mutation, "variables":{"answers": json.dumps(self.results)}})
-
-        print(self.results)
+        resp = await fetch(url,
+          method="POST",
+          body=json.dumps({"query": answer_mutation,"variables": {"answers": json.dumps(self.results)}}),
+          # credentials="same-origin",
+          headers=Object.fromEntries(to_js({"Content-Type": "application/json"})),
+        )
             
     
     # def callback(self):
