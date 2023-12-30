@@ -60,7 +60,7 @@ class Activity(object):
         self.submit_button = False
         self.timer = None            
         
-    def load_json(self, json_text):
+    async def load_json(self, json_text):
         self.index = 0
         for item in json_text:
             question = item["question"]
@@ -71,7 +71,7 @@ class Activity(object):
             q = Question(item["id"], question, question_figure, options, keywords, label)
             self.questions.append(q)
 
-        self.build_quiz_env()
+        await self.build_quiz_env()
        
     async def handle_submit(self, ph):
 
@@ -140,7 +140,7 @@ class Activity(object):
             pass
 
 
-    def build_quiz_env(self):
+    async def build_quiz_env(self):
         # enable pages using Tab widget
         
         for item in self.questions:
