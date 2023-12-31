@@ -6,6 +6,7 @@ except ImportError:
 import os
 import getpass
 import datetime
+import asyncio
 
 from collections import OrderedDict
 from IPython.display import Markdown, Image, Javascript
@@ -146,7 +147,7 @@ class Activity(object):
 
     async def build_quiz_env(self):
         # enable pages using Tab widget
-        
+        await asyncio.sleep(1)
         for item in self.questions:
             self.results_html = widgets.HTML("")
             self.top_margin = widgets.HTML("")
