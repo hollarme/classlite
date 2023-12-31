@@ -72,7 +72,7 @@ class Activity(object):
             q = Question(item["id"], question, question_figure, options, keywords, label)
             self.questions.append(q)
 
-        await self.build_quiz_env()
+        self.build_quiz_env()
        
     async def handle_submit(self, ph):
         await asyncio.sleep(1)
