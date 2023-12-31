@@ -61,7 +61,7 @@ class Activity(object):
         self.submit_button = False
         self.timer = None            
         
-    async def load_json(self, json_text):
+    def load_json(self, json_text):
         self.index = 0
         for item in json_text:
             question = item["question"]
@@ -71,8 +71,8 @@ class Activity(object):
             options = item["choices"]
             q = Question(item["id"], question, question_figure, options, keywords, label)
             self.questions.append(q)
-
-        await self.build_quiz_env
+        
+        self.build_quiz_env()
        
     async def handle_submit(self, ph):
         await asyncio.sleep(1)
@@ -145,9 +145,8 @@ class Activity(object):
             pass
 
 
-    async def build_quiz_env(self):
+    def build_quiz_env(self):
         # enable pages using Tab widget
-        await asyncio.sleep(1)
         for item in self.questions:
             self.results_html = widgets.HTML("")
             self.top_margin = widgets.HTML("")
@@ -170,7 +169,7 @@ class Activity(object):
 
             
         self.button = widgets.Button(description = "Submit")
-        self.button.on_click(await self.handle_submit)
+        self.button.on_click(asyncio.run(self.handle_submit))
         self.button.layout.margin = "20px"
         self.score_widgets = widgets.HTML("""<br/><br clear="all"/><b>Score</b>: """)
         
