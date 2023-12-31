@@ -31,6 +31,8 @@ answer_mutation = """mutation ($answers: JSON!) {
 
 answers = [{'id':1, 'user':'EEG/2006/033', 'choices':['a'], 'answer':None},{'id':2, 'user':'EEG/2006/033', 'choices':['b', 'c'], 'answer':None}]
 
+SUBMITTED = False
+
 class DialogBox():
     
     def __init__(self, title, body):
@@ -74,8 +76,9 @@ class Activity(object):
         
         self.build_quiz_env()
        
-    async def handle_submit(self, ph):
-        await asyncio.sleep(1)
+    def handle_submit(self, ph):
+        SUBMITTED = True
+        
         for item in self.quiz_container[:-1]:
             results = {}
             answers = []
@@ -99,21 +102,6 @@ class Activity(object):
                     results['choices'] = answers
                     self.results.append(results)
                     
-        #self.grader()
-        self.results['user'] = await ut.get_contents('settings','registration number', raw=False)
-        print(self.results)
-        
-        with open(self.results_filename, "a+") as g:
-            self.results.append({'submitted@': datetime.today().strftime('%m/%d/%Y %I:%M%p')})
-            g.write(json.dumps(self.results))
-
-        resp = await fetch(url,
-          method="POST",
-          body=json.dumps({"query": answer_mutation,"variables": {"answers": json.dumps(self.results)}}),
-          # credentials="same-origin",
-          headers=Object.fromEntries(to_js({"Content-Type": "application/json"})),
-        )
-            
     
     # def callback(self):
     #     if not self.submit_button:
@@ -292,4 +280,20 @@ class Question(object):
         self.right_options[0].update({'choices':[option[1] for option in self.options if option[0] == 'right']})
             
 
-
+async def main():
+    await asyncio.sleep(1)
+    if SUBMITTED:
+        self.results['user'] = await ut.get_contents('settings','registration number', raw=False)
+        print(self.results)
+        
+        with open(self.results_filename, "a+") as g:
+            self.results.append({'submitted@': datetime.today().strftime('%m/%d/%Y %I:%M%p')})
+            g.write(json.dumps(self.results))
+    
+        resp = await fetch(url,
+          method="POST",
+          body=json.dumps({"query": answer_mutation,"variables": {"answers": json.dumps(self.results)}}),
+          # credentials="same-origin",
+          headers=Object.fromEntries(to_js({"Content-Type": "application/json"})),
+        )
+    SUBMITTED = False
