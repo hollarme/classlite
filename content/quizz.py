@@ -170,7 +170,7 @@ class Activity(object):
 
             
         self.button = widgets.Button(description = "Submit")
-        self.button.on_click(self.handle_submit)
+        self.button.on_click(await self.handle_submit)
         self.button.layout.margin = "20px"
         self.score_widgets = widgets.HTML("""<br/><br clear="all"/><b>Score</b>: """)
         
