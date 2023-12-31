@@ -75,7 +75,7 @@ class Activity(object):
         await self.build_quiz_env()
        
     async def handle_submit(self, ph):
-
+        await asyncio.sleep(1)
         for item in self.quiz_container[:-1]:
             results = {}
             answers = []
